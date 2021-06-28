@@ -1,14 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 
-export default function Login({ handleSuccess, handleExit }) {
+export default function Login({ handleExit }) {
 
     const [state, setState] = useState({
         email: '',
         password: '',
     })
-    const { currentUser, login } = useAuth()
-    const [error, setError] = useState('');
+    const { login } = useAuth()
+    const [error, setError] = useState('')
+    const [success, setSuccess] = useState('')
     const [loading, setLoading] = useState(false)
 
     const handleChange = (e) => {
@@ -25,9 +26,13 @@ export default function Login({ handleSuccess, handleExit }) {
 
         try {
             setError('')
+            setSuccess('')
             setLoading(true)
             await login(state.email, state.password)
-            handleSuccess()
+            setSuccess('You have successfully login!')
+            setTimeout(() => {
+                handleExit()
+            }, 2000);
         } catch {
             setError('Failed to sign in.')
         }
@@ -49,6 +54,11 @@ export default function Login({ handleSuccess, handleExit }) {
                         {error &&
                             <div className="w-full bg-red-200 rounded-md py-2 px-3 my-3">
                                 <p className="text-red-700">{error}</p>
+                            </div>
+                        }
+                        {success &&
+                            <div className="w-full bg-green-200 rounded-md py-2 px-3 my-3">
+                                <p className="text-green-700">{success}</p>
                             </div>
                         }
                         <form

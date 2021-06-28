@@ -4,8 +4,10 @@ import _ from 'lodash'
 import { data } from '../data/courses_data'
 import Card from '../components/Card'
 import Dropdown from '../components/Dropdown'
-import { useAuth } from '../contexts/AuthContext'
 import Login from '../components/Login'
+import { useAuth } from '../contexts/AuthContext'
+import { useDispatchCart, useCart } from '../contexts/CartContext'
+import * as actions from '../config/action-types'
 
 export default function CoursesPage() {
 
@@ -18,6 +20,9 @@ export default function CoursesPage() {
         order: null
     })
     const [showLogin, setShowLogin] = useState(false)
+
+    const dispatch = useDispatchCart()
+    const lessonsInCart = useCart()
 
     useEffect(() => {
         let newLessonsArr = lessons.filter((val) => {
@@ -42,19 +47,23 @@ export default function CoursesPage() {
         })
     }
 
-    const addClass = () => {
+    const addToCart = (lesson) => {
         if (currentUser) {
-            console.log("SUCCESSFULL ADDED", currentUser)
+            if (!(_.find(lessonsInCart, lesson))) {
+                dispatch({ type: actions.addToCart, lesson })
+            }
         } else {
             setShowLogin(true)
         }
     }
 
-    const handleLoginSuccess = () => {
-        setShowLogin(false)
-    }
-    const handleExit = () => {
-        setShowLogin(false)
+    const removeFromCart = (lesson) => {
+        if (currentUser) {
+            const updatedLessons = _.reject(lessonsInCart, lesson)
+            dispatch({ type: actions.removeFromCart, updatedLessons })
+        } else {
+            setShowLogin(true)
+        }
     }
 
     return (
@@ -81,10 +90,18 @@ export default function CoursesPage() {
                                 />
                                 <div className="absolute w-full h-full inset-0 flex py-2 px-5">
                                     <div className="w-full h-full relative">
-                                        <button
-                                            onClick={addClass}
-                                            className="absolute top-0 right-0 w-8 h-8 bg-green-600 flex justify-center items-center text-white font-bold z-20"
-                                        >+</button>
+                                        {
+                                            _.find(lessonsInCart, lesson)
+                                                ? <button
+                                                    onClick={() => removeFromCart(lesson)}
+                                                    className="absolute top-0 right-0 w-8 h-8 bg-red-200 flex justify-center items-center text-red-700 font-bold z-20"
+                                                >-</button>
+                                                : <button
+                                                    onClick={() => addToCart(lesson)}
+                                                    className="absolute top-0 right-0 w-8 h-8 bg-green-200 flex justify-center items-center text-green-700 font-bold z-20"
+                                                >+</button>
+                                        }
+
                                     </div>
                                 </div>
                             </div>
@@ -96,8 +113,7 @@ export default function CoursesPage() {
                 showLogin &&
                 <div className="fixed w-screen h-screen inset-0 backdrop-blur-md z-30">
                     <Login
-                        handleSuccess={handleLoginSuccess}
-                        handleExit={handleExit}
+                        handleExit={() => setShowLogin(false)}
                     />
                 </div>
             }
