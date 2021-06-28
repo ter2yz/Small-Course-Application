@@ -6,7 +6,7 @@ export default function Card({ className, data }) {
 
     return (
         <div className={className}>
-            <div className="w-full border border-gray-200 rounded-lg flex flex-col">
+            <div className="w-full h-full border border-gray-200 rounded-lg flex flex-col">
                 <img
                     className="w-full h-40 object-contain object-center"
                     src={image}

@@ -84,7 +84,7 @@ export default function CoursesPage() {
                         currentLessons && currentLessons.map((lesson, key) =>
                             <div className="relative w-1/3 py-2 px-5">
                                 <Card
-                                    className="w-full"
+                                    className="w-full h-full"
                                     data={lesson}
                                     key={key}
                                 />
