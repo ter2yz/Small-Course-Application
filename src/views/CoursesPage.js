@@ -4,9 +4,12 @@ import _ from 'lodash'
 import { data } from '../data/courses_data'
 import Card from '../components/Card'
 import Dropdown from '../components/Dropdown'
+import { useAuth } from '../contexts/AuthContext'
+import Login from '../components/Login'
 
 export default function CoursesPage() {
 
+    const { currentUser } = useAuth()
     const lessons = data[0].lessons
     const [searchTerm, setSearchTerm] = useState('')
     const [currentLessons, setCurrentLessons] = useState(lessons)
@@ -14,6 +17,7 @@ export default function CoursesPage() {
         handle: null,
         order: null
     })
+    const [showLogin, setShowLogin] = useState(false)
 
     useEffect(() => {
         let newLessonsArr = lessons.filter((val) => {
@@ -38,6 +42,21 @@ export default function CoursesPage() {
         })
     }
 
+    const addClass = () => {
+        if (currentUser) {
+            console.log("SUCCESSFULL ADDED", currentUser)
+        } else {
+            setShowLogin(true)
+        }
+    }
+
+    const handleLoginSuccess = () => {
+        setShowLogin(false)
+    }
+    const handleExit = () => {
+        setShowLogin(false)
+    }
+
     return (
         <div className="w-full flex justify-center items-center">
             <div className="container">
@@ -54,15 +73,34 @@ export default function CoursesPage() {
 
                     {
                         currentLessons && currentLessons.map((lesson, key) =>
-                            <Card
-                                className="w-1/3 py-2 px-5"
-                                data={lesson}
-                                key={key}
-                            />
+                            <div className="relative w-1/3 py-2 px-5">
+                                <Card
+                                    className="w-full"
+                                    data={lesson}
+                                    key={key}
+                                />
+                                <div className="absolute w-full h-full inset-0 flex py-2 px-5">
+                                    <div className="w-full h-full relative">
+                                        <button
+                                            onClick={addClass}
+                                            className="absolute top-0 right-0 w-8 h-8 bg-green-600 flex justify-center items-center text-white font-bold z-20"
+                                        >+</button>
+                                    </div>
+                                </div>
+                            </div>
                         )
                     }
                 </div>
             </div>
+            {
+                showLogin &&
+                <div className="fixed w-screen h-screen inset-0 backdrop-blur-md z-30">
+                    <Login
+                        handleSuccess={handleLoginSuccess}
+                        handleExit={handleExit}
+                    />
+                </div>
+            }
         </div>
     )
 }
