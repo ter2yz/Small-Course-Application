@@ -41,7 +41,7 @@ export default function Login({ handleExit }) {
     const handleSubmit = async (e) => {
         e.preventDefault()
         setLoading(true)
-        setStatus({ status: 'loading', text: 'Loading...', bgClass: 'bg-green-200', textClass: 'text-green-700' })
+        setStatus({ status: 'loading', text: 'You are signing in...', bgClass: 'bg-yellow-200', textClass: 'text-yellow-700' })
         try {
             await login(state.email, state.password)
             setStatus({ status: 'success', text: 'You have successfully login!', bgClass: 'bg-green-200', textClass: 'text-green-700' })
@@ -66,7 +66,7 @@ export default function Login({ handleExit }) {
                 <div className="w-full flex flex-col justify-center items-center">
                     <div className="w-10/12 lg:w-1/3 py-10 px-8 flex flex-col items-center border border-gray-300 rounded-lg bg-glass-500">
                         <h2 className="font-poppins text-3xl font-bold py-4 text-gray-800 uppercase">Login</h2>
-                        <div className={`w-full ${status.bgClass} rounded-md transition-all overflow-hidden ${status.status ? 'max-h-screen py-2 px-3 my-3' : 'max-h-0 py-0 px-0 my-0'}`}>
+                        <div className={`w-full ${status.bgClass} text-sm rounded-md transition-all overflow-hidden ${status.status ? 'max-h-screen py-2 px-3 my-3' : 'max-h-0 py-0 px-0 my-0'}`}>
                             <p className={`${status.textClass}`}>{status.text}</p>
                         </div>
                         <form
