@@ -10,6 +10,8 @@ const reducer = (state, action) => {
             return [...state, action.lesson]
         case actions.removeFromCart:
             return action.updatedLessons
+        case actions.resetCart:
+            return []
         default:
             throw new Error(`unknown action ${action.type}`)
     }

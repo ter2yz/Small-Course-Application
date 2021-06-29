@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from 'react'
+import { IoCloseCircleSharp } from 'react-icons/io5'
 
-export default function Dropdown({ onChange }) {
+export default function Dropdown({ onChange, data, btnName, className }) {
 
     const [isOpen, setIsOpen] = useState(false)
     const [state, setState] = useState({
-        name: null,
-        value: null
+        handle: null,
+        value: null,
+        label: null
     })
 
     const handleClick = (e) => {
         e.preventDefault()
-        const { name, value } = e.target.dataset
+        const { handle, value } = e.target.dataset
+        const label = e.target.innerText
         setState(preState => ({
             ...preState,
-            name,
-            value
+            handle,
+            value,
+            label
         }))
         setIsOpen(false)
     }
@@ -25,29 +29,40 @@ export default function Dropdown({ onChange }) {
 
     return (
         <div
-            className="relative flex flex-col"
+            className={`relative ${className}`}
         >
-            <div className="flex items-center">
-                <button onClick={() => setIsOpen(!isOpen)} className="px-2 py-2 w-40 border border-gray-200">
+            <div className="relative flex items-center z-30">
+                <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className={`bg-glass-300 px-2 py-2 w-40 text-white text-sm text-center transition-all rounded-t-lg transition-all duration-500 hover:shadow-lg ${isOpen ? 'rounded-b-none' : 'rounded-b-lg'} text-shadow-md`}
+                >
                     {
-                        (state.name && state.value)
-                            ? <div className="flex">
-                                <p>{state.name} - {state.value}</p>
+                        (state.label)
+                            ? <div className="flex justify-center">
+                                <p>{state.label}</p>
                             </div>
-                            : <p>Filter</p>
+                            : <p>{btnName}</p>
                     }
                 </button>
                 {
-                    (state.name && state.value)
-                        ? <button className="ml-2 w-6 h-6 flex justify-center items-center rounded-full bg-black text-white" onClick={() => setState({ name: null, value: null })}>X</button>
+                    (state.handle && state.value)
+                        ? <button className="absolute left-full ml-1 flex justify-center items-center text-2xl text-gray-300 hover:text-gray-100 transition" onClick={() => setState({ handle: null, value: null, label: null })}><IoCloseCircleSharp /></button>
                         : ''
                 }
             </div>
-            <div className={`${isOpen ? 'max-h-screen' : 'max-h-0'} min-w-max absolute top-full left-0 shadow-lg transition-all duration-500 bg-white overflow-hidden flex flex-col items-start`}>
-                <button onClick={handleClick} data-name="publishDate" data-value="asc" className="my-2 px-2 py-1">Publish date: ASC</button>
-                <button onClick={handleClick} data-name="publishDate" data-value="desc" className="my-2 px-2 py-1">Publish date: DESC</button>
-                <button onClick={handleClick} data-name="duration" data-value="asc" className="my-2 px-2 py-1">Duration: ASC</button>
-                <button onClick={handleClick} data-name="duration" data-value="desc" className="my-2 px-2 py-1">Duration: ASC</button>
+            <div className={`${isOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'} min-w-max absolute top-full left-0 shadow-lg transition-all duration-500 bg-glass overflow-hidden flex flex-col items-start rounded-b-lg rounded-tr-lg z-20`}>
+                {
+                    data && data.map((single, index) =>
+                        <button
+                            onClick={handleClick}
+                            data-handle={single.handle}
+                            data-value={single.value}
+                            className={`w-full text-left text-shadow-md text-sm text-gray-600 hover:text-gray-700 bg-gray-200 bg-opacity-0 hover:bg-opacity-20 transition duration-500 px-4 py-3 border-opacity-50 ${data[index + 1] ? 'border-b border-white' : ''}`}
+                        >
+                            {single.label}
+                        </button>
+                    )
+                }
             </div>
         </div>
     )

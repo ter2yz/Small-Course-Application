@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import _ from 'lodash'
+import { motion, AnimatePresence } from 'framer-motion'
 
 import { data } from '../data/courses_data'
 import Card from '../components/Card'
@@ -39,10 +40,18 @@ export default function CoursesPage() {
         }
     }, [searchTerm, lessons, filter])
 
+    useEffect(() => {
+        if (showLogin) {
+            document.body.style.overflow = "hidden"
+        } else {
+            document.body.style.overflow = "auto"
+        }
+    }, [showLogin])
+
     const updateFilter = (data) => {
-        const { name, value } = data
+        const { handle, value } = data
         setFilter({
-            handle: name,
+            handle,
             order: value
         })
     }
@@ -67,51 +76,68 @@ export default function CoursesPage() {
     }
 
     return (
-        <div className="w-full flex justify-center items-center">
+        <div className="w-full flex justify-center items-center pb-20">
             <div className="container">
-                <div className="w-full flex justify-center py-10">
+                <div className="relative w-full flex flex-col sm:flex-row justify-center items-start sm:items-center py-5 sm:py-10 z-40 px-5 sm:px-0">
                     <input
-                        className="max-w-full w-80 py-2 px-4 mr-3 rounded-lg border border-gray-200 focus:outline-none focus:border-gray-500 transition"
+                        className="bg-glass max-w-full w-full sm:w-80 py-2 px-4 mr-3 mb-2 sm:mb-0 rounded-lg focus:outline-none transition duration-500 hover:shadow-lg focus:shadow-lg placeholder-gray-300 text-white"
                         type="text"
                         placeholder="Search..."
                         onChange={e => { setSearchTerm(e.target.value) }}
                     />
-                    <Dropdown onChange={updateFilter} />
+                    <Dropdown
+                        onChange={updateFilter}
+                        btnName={'Filter'}
+                        data={[
+                            { handle: 'publishDate', value: 'asc', label: 'Publish date: ASC' },
+                            { handle: 'publishDate', value: 'desc', label: 'Publish date: DESC' },
+                            { handle: 'duration', value: 'asc', label: 'Duration: ASC' },
+                            { handle: 'duration', value: 'desc', label: 'Duration: DESC' },
+                        ]}
+                    />
                 </div>
-                <div className="w-full flex justify-start flex-wrap">
+                <div className="relative w-full flex justify-start flex-wrap">
 
-                    {
-                        currentLessons && currentLessons.map((lesson, key) =>
-                            <div className="relative w-1/3 py-2 px-5">
-                                <Card
-                                    className="w-full h-full"
-                                    data={lesson}
-                                    key={key}
-                                />
-                                <div className="absolute w-full h-full inset-0 flex py-2 px-5">
-                                    <div className="w-full h-full relative">
-                                        {
-                                            _.find(lessonsInCart, lesson)
-                                                ? <button
-                                                    onClick={() => removeFromCart(lesson)}
-                                                    className="absolute top-0 right-0 w-8 h-8 bg-red-200 flex justify-center items-center text-red-700 font-bold z-20"
-                                                >-</button>
-                                                : <button
-                                                    onClick={() => addToCart(lesson)}
-                                                    className="absolute top-0 right-0 w-8 h-8 bg-green-200 flex justify-center items-center text-green-700 font-bold z-20"
-                                                >+</button>
-                                        }
+                    <AnimatePresence>
+                        {
+                            currentLessons && currentLessons.map((lesson, key) =>
+                                <motion.div
+                                    className="relative group w-full md:w-1/2 lg:w-1/3 py-2 px-5"
+                                    key={lesson.name}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                >
+                                    <Card
+                                        className="relative w-full h-full z-0"
+                                        data={lesson}
+                                        key={key}
+                                    />
+                                    <div className="absolute inset-0 flex py-2 px-5 transition duration-500 opacity-0 group-hover:opacity-100 -translate-y-4 group-hover:translate-y-0 transform z-10">
+                                        <div className="w-full h-full relative">
+                                            {
+                                                _.find(lessonsInCart, lesson)
+                                                    ? <button
+                                                        onClick={() => removeFromCart(lesson)}
+                                                        className="absolute top-3 right-2 w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 via-red-400 to-red-500 flex justify-center items-center text-red-100 font-bold z-20 shadow-md transition scale-100 hover:scale-110"
+                                                    >-</button>
+                                                    : <button
+                                                        onClick={() => addToCart(lesson)}
+                                                        className="absolute top-3 right-2 w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-blue-400 flex justify-center items-center text-green-100 font-bold z-20 shadow-md transition scale-100 hover:scale-110"
+                                                    >+</button>
+                                            }
 
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        )
-                    }
+                                </motion.div>
+                            )
+                        }
+                    </AnimatePresence>
                 </div>
             </div>
             {
                 showLogin &&
-                <div className="fixed w-screen h-screen inset-0 backdrop-blur-md z-30">
+                <div className="fixed w-screen h-screen inset-0 backdrop-blur-md z-40">
                     <Login
                         handleExit={() => setShowLogin(false)}
                     />
