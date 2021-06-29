@@ -25,6 +25,7 @@ export default function Dropdown({ onChange, data, btnName, className }) {
 
     useEffect(() => {
         onChange(state)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [state])
 
     return (
